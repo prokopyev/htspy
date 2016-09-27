@@ -43,10 +43,10 @@ def scrape_with_page(query, api, restart_id=False):
     page_len = 1
     while page_len > 0:
         if restart_id:
-            page = api.search(q=query.value, locale="en", rpp=TWEET_PER_CALL, result_type='recent',
+            page = api.search(q=query.value, locale="en", count=TWEET_PER_CALL, result_type='recent',
                                  max_id=restart_id)
         else:
-            page = api.search(q=query.value, locale="en", rpp=TWEET_PER_CALL, result_type='recent')
+            page = api.search(q=query.value, locale="en", count=TWEET_PER_CALL, result_type='recent')
             restart_id=0
 
         batch_tweets = []

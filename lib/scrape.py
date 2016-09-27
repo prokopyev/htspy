@@ -40,20 +40,25 @@ class Query:
 
 
 def scrape_with_page(query, api, restart_id=False):
-    if restart_id:
-        cur = tweepy.Cursor(api.search, q=query.value, locale="en", count=TWEET_PER_CALL, result_type='recent',
-                            max_id=restart_id).pages()
-    else:
-        cur = tweepy.Cursor(api.search, q=query.value, locale="en", count=TWEET_PER_CALL, result_type='recent').pages()
+    page_len = 1
+    while page_len > 0:
+        if restart_id:
+            page = api.search(q=query.value, locale="en", rpp=TWEET_PER_CALL, result_type='recent',
+                                 max_id=restart_id)
+        else:
+            page = api.search(q=query.value, locale="en", rpp=TWEET_PER_CALL, result_type='recent')
+            restart_id=0
 
-    for page in cur:
         batch_tweets = []
-        if len(page) > 0:
+        page_len = len(page)
+
+        if page_len > 0:
             for tweet in page:
                 if tweet.id != restart_id:
                     batch_tweets.append(Tweet(tweet).value)
 
             utils.save_to_mongo(batch_tweets)
+            restart_id = page[-1].id
             sleep(TWEET_REST_TIME)
         else:
             return False

@@ -13,8 +13,8 @@ def __mongo_collection():
 def __get_max_tweet(tweets):
     v = -1
     for t in tweets:
-        if t.id > v:
-            v = t.id
+        if t['_id'] > v:
+            v = t['_id']
 
     return v
 

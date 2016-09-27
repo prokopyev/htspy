@@ -12,13 +12,13 @@ Example code
 ```python
 from lib.scrape import Query, scrape
 
-hashtags = [
-    'tag1',
-    'tag2',
-    'tag3',
-    'tag4'
+terms = [
+    '#tag1',
+    '#tag2',
+    'term1',
+    'term2'
 ]
 
-q = Query('2016-09-21', '2016-09-27', hashtags)
+q = Query('2016-09-21', '2016-09-27', terms)
 scrape(q, apikey, apisecret, False)
 ```

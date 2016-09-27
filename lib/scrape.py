@@ -6,10 +6,10 @@ import lib.utils as utils
 
 
 class Query:
-    def __init__(self, start_date, end_date, hashtags):
+    def __init__(self, start_date, end_date, terms):
         self.start_date = start_date
         self.end_date = end_date
-        self.hashtags = hashtags
+        self.terms = terms
         self.__value = self.__build_query()
 
     @property
@@ -17,22 +17,22 @@ class Query:
         return self.__value
 
     @staticmethod
-    def __hashtag_parse(hashtag, is_multi):
+    def __term_parse(term, is_multi):
         if is_multi:
-            return ' OR #' + hashtag
+            return ' OR ' + term
         else:
-            return '#' + hashtag
+            return term
 
-    def __hashtag_concat(self):
+    def __term_concat(self):
         s = ''
-        for h in range(len(self.hashtags)):
-            s += self.__hashtag_parse(self.hashtags[h], h > 0)
+        for t in range(len(self.terms)):
+            s += self.__term_parse(self.terms[t], t > 0)
 
         return s
 
     def __build_query(self):
-        s = '{HASHTAGS} since:{SINCE} until:{UNTIL}'.format(
-            HASHTAGS=self.__hashtag_concat(),
+        s = '{TERMS} since:{SINCE} until:{UNTIL}'.format(
+            TERMS=self.__term_concat(),
             SINCE=self.start_date,
             UNTIL=self.end_date
         )

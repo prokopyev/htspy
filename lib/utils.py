@@ -69,8 +69,8 @@ def mongo_get_oldest():
     # if we need to restart the capture
     collection = __mongo_collection()
 
-    obj = collection.find({}, {'tweet_id': 1}).sort('tweet_id', pymongo.ASCENDING).limit(1)
+    obj = collection.find({}, {'_id': 1}).sort('_id', pymongo.ASCENDING).limit(1)
     if obj.count() == 0:
         return False
     else:
-        return obj[0]['tweet_id']
+        return obj[0]['_id']

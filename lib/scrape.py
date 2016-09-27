@@ -82,6 +82,7 @@ def scrape(query, api_key, api_secret, resume_last):
             print("MongoDB write error: ({E})".format(E=e))
             continue_loop = False
         except Exception as e:
+            error_count += 1
             print("General error: Probably connection related. Retrying in 180s. ({E})".format(E=e))
             sleep(180)
 

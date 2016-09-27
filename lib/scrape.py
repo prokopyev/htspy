@@ -39,10 +39,7 @@ class Query:
         return s
 
 
-def scrape_with_page(query, api_key, api_secret, restart_id=False):
-    auth = tweepy.AppAuthHandler(api_key, api_secret)
-    api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
-
+def scrape_with_page(query, api, restart_id=False):
     if restart_id:
         cur = tweepy.Cursor(api.search, q=query.value, locale="en", count=TWEET_PER_CALL, result_type='recent',
                             max_id=restart_id).pages()
@@ -63,6 +60,9 @@ def scrape_with_page(query, api_key, api_secret, restart_id=False):
 
 
 def scrape(query, api_key, api_secret, resume_last):
+    auth = tweepy.AppAuthHandler(api_key, api_secret)
+    api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
+
     error_count = 0
     continue_loop = True
     restart_id = False
@@ -77,7 +77,7 @@ def scrape(query, api_key, api_secret, resume_last):
             ))
 
         try:
-            continue_loop = scrape_with_page(query, api_key, api_secret, restart_id)
+            continue_loop = scrape_with_page(query, api, restart_id)
         except ImportError as e:
             print("MongoDB write error: ({E})".format(E=e))
             continue_loop = False

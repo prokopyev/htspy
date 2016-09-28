@@ -73,8 +73,11 @@ def scrape(query, api_key, api_secret, resume_last):
     restart_id = False
 
     while error_count < SCRAPE_MAX_RESTARTS and continue_loop:
-        if resume_last:
+        if resume_last == -1:
             restart_id = utils.mongo_get_oldest()
+            print("Resuming from tweet id: {ID}".format(ID=restart_id))
+        elif resume_last > 0:
+            restart_id = resume_last
             print("Resuming from tweet id: {ID}".format(ID=restart_id))
         else:
             print("Scraping backwards from: {DATE}".format(

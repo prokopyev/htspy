@@ -29,6 +29,6 @@ tweets-scrape.py
 9. user (id, screen name, real name)
 
 ## Notes
-1. The optional --restart-id argument allows for manually specifying where the scrape should restart from. This is used to override the default logic where the restart-id is presumed to be the earliest/smalled tweet_id value in the database.
-2. It is presently best to keep a fixed end-date value as tweets are returned in reverse chronological order by the API. Otherwise you will have to manually identify the "gap" by setting --restart-id to restart from the correct location.
+1. The optional `--restart-id` argument allows for manually specifying where the scrape should restart from. This is used to override the default logic where the restart-id is presumed to be the earliest/smalled tweet_id value in the database.
+2. It is presently best to keep a fixed end-date value as tweets are returned in reverse chronological order by the API. Otherwise you will have to manually identify the "gap" by setting `--restart-id` to restart from the correct location.
 3. Favorite & retweet counts are as of the time of the scrape. Thus even the same past tweet could have different counts if it accumulated new favorites or retweets since the previous scrape.

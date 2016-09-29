@@ -4,7 +4,7 @@ Wrapper for tweepy which makes it easier to capture all tweets matching a group 
 ## Instructions
 1. Create a local MongoDB instance and update constants.py with the appropriate DB & collection names
 2. Install pymongo and tweepy using PIP
-3. Run tweets-scrape with the required arguments
+3. Run tweets-scrape with the required arguments below
 
 Example code
 
@@ -15,6 +15,7 @@ tweets-scrape.py
 --start-date 2016-09-26 
 --end-date 2016-09-28 
 --terms food,burgers,#bbq
+--collection foodtweets
 ```
 
 ## Captured Fields
@@ -30,5 +31,6 @@ tweets-scrape.py
 
 ## Notes
 1. The optional `--restart-id` argument allows for manually specifying where the scrape should restart from. This is used to override the default logic where the restart-id is presumed to be the earliest/smalled tweet_id value in the database.
-2. It is presently best to keep a fixed end-date value as tweets are returned in reverse chronological order by the API. Otherwise you will have to manually identify the "gap" by setting `--restart-id` to restart from the correct location.
+2. Tweets are returned in reverse chronological order by the API. It is best to always scrape from newest to oldest. If you try to add new days, you will have to manually set `--restart-id` to restart from the correct location. Otherwise, the script will always search for the minimum tweet_id.
 3. Favorite & retweet counts are as of the time of the scrape. Thus even the same past tweet could have different counts if it accumulated new favorites or retweets since the previous scrape.
+4. MongoDB database is always 'twitter' while the collection name may be changed.

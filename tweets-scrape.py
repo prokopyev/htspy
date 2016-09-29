@@ -28,6 +28,9 @@ if __name__ == '__main__':
        help='A comma separated string array containing one or more terms or hashtags which the query should search for. '
             'Each term is joined using an OR statement resulting in tweets matching any of the defined terms.')
 
+    ag('--collection', type=str, default=None,
+       help='The name of the MongoDB collection which results should be saved to.')
+
     ag('--resume-id', type=int, default=0,
        help='An integer representing the Tweet Id where the scrape should begin from. A default value of 0 means the '
             'scrape will begin at the end-date value or earliest available Tweet Id in the database. '
@@ -44,5 +47,6 @@ if __name__ == '__main__':
     scrape(query=qry,
            api_key=args.api_key,
            api_secret=args.api_secret,
+           collection=args.collection,
            resume_id=args.resume_id
            )

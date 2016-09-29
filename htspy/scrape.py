@@ -46,7 +46,7 @@ def __twitter_get_api(api_key, api_secret):
 
     return api
 
-def __twitter_get_page(query, api, resume_id=0):
+def __twitter_get_page(query, api, collection, resume_id=0):
     page_len = 1
     while page_len > 0:
         if resume_id > 0:
@@ -64,14 +64,15 @@ def __twitter_get_page(query, api, resume_id=0):
                 if tweet.id != resume_id:
                     batch_tweets.append(Tweet(tweet).value)
 
-            utils.mongo_save(batch_tweets)
+            db = utils.MongoDB('twitter', collection)
+            db.mongo_save(batch_tweets)
             resume_id = page[-1].id
             sleep(TWEET_REST_TIME)
         else:
             return False
 
 
-def scrape(query, api_key, api_secret, resume_id=0):
+def scrape(query, api_key, api_secret, collection, resume_id=0):
     api = __twitter_get_api(api_key, api_secret)
     error_count = 0
     continue_loop = True
@@ -80,7 +81,8 @@ def scrape(query, api_key, api_secret, resume_id=0):
         if resume_id > 0:
             print("Scrape: Resume from Tweet ({ID})".format(ID=resume_id))
         else:
-            resume_id = utils.mongo_get_oldest()
+            db = utils.MongoDB('twitter', collection)
+            resume_id = db.mongo_get_oldest()
             if not resume_id:
                 print("Scrape: Start from {DATE}".format(
                     DATE=query.end_date
@@ -90,7 +92,7 @@ def scrape(query, api_key, api_secret, resume_id=0):
 
 
         try:
-            continue_loop = __twitter_get_page(query, api, resume_id)
+            continue_loop = __twitter_get_page(query, api, collection, resume_id)
         except ImportError as e:
             print("MongoDB Error: ({E})".format(E=e))
             continue_loop = False

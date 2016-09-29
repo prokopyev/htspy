@@ -8,7 +8,7 @@ Wrapper for tweepy which makes it easier to capture all tweets matching a group 
 
 Example code
 
-```python
+```
 tweets-scrape.py 
 --api-key yourkey
 --api-secret yoursecret

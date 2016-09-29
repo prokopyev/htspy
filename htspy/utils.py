@@ -1,7 +1,7 @@
 import pymongo
 import json
 import datetime
-from lib.constants import *
+from htspy.constants import *
 
 
 def __mongo_collection():
@@ -19,7 +19,7 @@ def __get_max_tweet(tweets):
     return v
 
 
-def save_to_mongo(tweets):
+def mongo_save(tweets):
     if len(tweets) == 0:
         raise ValueError('No tweets available to save')
 
@@ -30,7 +30,7 @@ def save_to_mongo(tweets):
             TIME=datetime.datetime.now().isoformat()
         ))
     except pymongo.errors.BulkWriteError as e:
-        raise ImportError('Failed to write batch to MongoDB. Check for duplication. Last TweetId: {ID}'.format(
+        raise ImportError('Failed to write batch to MongoDB. Check for duplication. Max Tweet Id in batch: {ID}'.format(
             ID=__get_max_tweet(tweets)
         ))
 
@@ -66,7 +66,7 @@ def mongo_get_tweets():
 
 def mongo_get_oldest():
     # Tweets are returned in reverse order so by querying for the oldest record we know where to pick up
-    # if we need to restart the capture
+    # if we need to restart the capture.
     collection = __mongo_collection()
 
     obj = collection.find({}, {'_id': 1}).sort('_id', pymongo.ASCENDING).limit(1)

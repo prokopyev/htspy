@@ -17,25 +17,24 @@ class Tweet:
             "text": self.__tweet.text,
             "coordinates": self.__tweet.coordinates,
             "created_at": self.__tweet.created_at,
-            "entities": self.parse_entities(self.__tweet.entities),
+            "entities": self.__parse_entities(self.__tweet.entities),
             "favorite_count": self.__tweet.favorite_count,
             "retweet_count": self.__tweet.retweet_count,
-            "is_retweet": self.parse_is_retweet(self.__tweet),
+            "is_retweet": self.__parse_is_retweet(self.__tweet),
             "user": {
                 "screen_name": self.__tweet.user.screen_name,
                 "name": self.__tweet.user.name,
                 "id_str": self.__tweet.user.id_str
             }
         }
-    
-        # Most tweets do not appear to have coordinates available
+
         if not d['coordinates']:
             d.pop('coordinates')
     
         return d
 
     @staticmethod
-    def parse_entities(entities):
+    def __parse_entities(entities):
         urls = []
         mentions = []
         hashtags = []
@@ -61,5 +60,5 @@ class Tweet:
         return dict((k, v) for k, v in d.items() if v)
 
     @staticmethod
-    def parse_is_retweet(tweet):
+    def __parse_is_retweet(tweet):
         return hasattr(tweet, 'retweeted_status')

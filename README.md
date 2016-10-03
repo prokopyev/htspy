@@ -31,6 +31,6 @@ tweets-scrape.py
 
 ## Notes
 1. The optional `--restart-id` argument allows for manually specifying where the scrape should restart from. This is used to override the default logic where the restart-id is presumed to be the earliest/smalled tweet_id value in the database.
-2. Tweets are returned in reverse chronological order by the API. It is best to always scrape from newest to oldest. If you try to add new days, you will have to manually set `--restart-id` to restart from the correct location. Otherwise, the script will always search for the minimum tweet_id.
+2. Tweets are returned in reverse chronological order by the API. Try to scrape from newest to oldest in order to avoid confusion as default restart checks for oldest tweet in db.
 3. Favorite & retweet counts are as of the time of the scrape. Thus even the same past tweet could have different counts if it accumulated new favorites or retweets since the previous scrape.
 4. MongoDB database is always 'twitter' while the collection name may be changed.

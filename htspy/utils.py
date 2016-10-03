@@ -33,9 +33,16 @@ class MongoDB:
                 TIME=datetime.datetime.now().isoformat()
             ))
         except pymongo.errors.BulkWriteError as e:
-            raise ImportError('Failed to write batch to MongoDB. Check for duplication. Max Tweet Id in batch: {ID}'.format(
-                ID=self.__get_max_tweet(tweets)
-            ))
+            # Fall back to importing one at a time until failure
+            i = 0
+            try:
+                for tweet in tweets:
+                    self.__mongo_collection().insert(tweet)
+                    i += 1
+            except pymongo.errors.BulkWriteError as e:
+                raise ImportError('Failed to write batch to MongoDB. Check for duplication. Failed at: {ID}'.format(
+                    ID=tweets[i]['_id']
+                ))
 
 
     def mongo_to_json(self, path):

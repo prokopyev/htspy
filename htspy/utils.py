@@ -36,9 +36,11 @@ class MongoDB:
             # Fall back to importing one at a time until failure
             i = 0
             try:
+                print('Bulk insert failed, falling back to single insert mode...')
                 for tweet in tweets:
                     self.__mongo_collection().insert(tweet)
                     i += 1
+                    print('Single insert record: {I}'.format(I=i))
             except pymongo.errors.BulkWriteError as e:
                 raise ImportError('Failed to write batch to MongoDB. Check for duplication. Failed at: {ID}'.format(
                     ID=tweets[i]['_id']

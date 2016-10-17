@@ -72,7 +72,7 @@ def __twitter_get_page(query, api, collection, resume_id=0):
             return False
 
 
-def scrape(query, api_key, api_secret, collection, resume_id=0):
+def scrape(query, api_key, api_secret, collection, resume_id=0, mongo_user=None, mongo_pw=None, mongo_auth=None):
     api = __twitter_get_api(api_key, api_secret)
     error_count = 0
     continue_loop = True
@@ -81,7 +81,7 @@ def scrape(query, api_key, api_secret, collection, resume_id=0):
         if resume_id > 0:
             print("Scrape: Resume from Tweet ({ID})".format(ID=resume_id))
         else:
-            db = utils.MongoDB('twitter', collection)
+            db = utils.MongoDB('twitter', collection, user=mongo_user, pw=mongo_pw, auth=mongo_auth)
             resume_id = db.mongo_get_oldest()
             if not resume_id:
                 print("Scrape: Start from {DATE}".format(

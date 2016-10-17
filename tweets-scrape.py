@@ -36,6 +36,15 @@ if __name__ == '__main__':
             'scrape will begin at the end-date value or earliest available Tweet Id in the database. '
             'Providing a value will begin the scrape at (ID-1).')
 
+    ag('--user', type=str, default=None,
+       help='The MongoDB user name for authentication.')
+
+    ag('--password', type=str, default=None,
+       help='The MongoDB password for authentication.')
+
+    ag('--authDatabase', type=str, default=None,
+       help='The MongoDB authentication database.')
+
     args = parser.parse_args()
 
     terms = str(args.terms).split(',')
@@ -48,5 +57,8 @@ if __name__ == '__main__':
            api_key=args.api_key,
            api_secret=args.api_secret,
            collection=args.collection,
-           resume_id=args.resume_id
+           resume_id=args.resume_id,
+           mongo_auth=args.authDatabase,
+           mongo_pw=args.password,
+           mongo_user=args.user
            )

@@ -3,12 +3,15 @@ import json
 import datetime
 
 class MongoDB:
-    def __init__(self, db, collection):
+    def __init__(self, db, collection, user=None, pw=None, auth=None):
         self.__db = db
         self.__collection = collection
+        self.__user=user,
+        self.__pw=pw,
+        self.__auth=auth
 
     def __mongo_collection(self):
-        client = pymongo.MongoClient()
+        client = pymongo.MongoClient(self.__get_uri('localhost',self.__user, self.__pw, self.__auth))
         db = client.get_database(self.__db)
         return db.get_collection(self.__collection)
 
@@ -20,6 +23,22 @@ class MongoDB:
                 v = t['_id']
 
         return v
+
+
+    @staticmethod
+    def __get_uri(host, user=None, pw=None, auth_db=None):
+        if not (user and pw and auth_db):
+            s = 'mongodb://{HOST}:27017'.format(
+                HOST=host
+            )
+        else:
+            s = 'mongodb://{USER}:{PASS}@{HOST}:27017/{DB}'.format(
+                HOST=host,
+                USER=user,
+                PASS=pw,
+                DB=auth_db
+            )
+        return s
 
 
     def mongo_save(self, tweets):

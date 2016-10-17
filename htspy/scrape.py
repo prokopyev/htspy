@@ -50,10 +50,10 @@ def __twitter_get_page(query, api, collection, resume_id=0):
     page_len = 1
     while page_len > 0:
         if resume_id > 0:
-            page = api.search(q=query.value, locale="en", count=TWEET_PER_CALL, result_type='recent',
+            page = api.search(q=query.value, locale="en", lang="en", count=TWEET_PER_CALL, result_type='recent',
                               max_id=resume_id)
         else:
-            page = api.search(q=query.value, locale="en", count=TWEET_PER_CALL, result_type='recent')
+            page = api.search(q=query.value, locale="en", lang="en", count=TWEET_PER_CALL, result_type='recent')
             resume_id=0
 
         batch_tweets = []

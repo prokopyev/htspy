@@ -20,7 +20,7 @@ class Query:
     @staticmethod
     def __term_parse(term, is_multi):
         if is_multi:
-            return ' OR ' + term
+            return '%20OR%20' + term
         else:
             return term
 

@@ -12,7 +12,7 @@ Wrapper for tweepy which makes it easier to capture all tweets matching a group 
 2. Install pymongo and tweepy using PIP
 3. Run tweets-scrape with the required arguments below
 
-Example code
+## Example code
 
 Get all tweets containing specific terms
 ```

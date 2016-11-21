@@ -1,4 +1,4 @@
-from htspy.scrape import scrape, Query
+from htspy.scrape import scrape_search, Query
 import argparse
 
 if __name__ == '__main__':
@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 end_date=args.end_date,
                 terms=terms)
 
-    scrape(query=qry,
+    scrape_search(query=qry,
            api_key=args.api_key,
            api_secret=args.api_secret,
            collection=args.collection,

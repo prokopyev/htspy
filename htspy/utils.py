@@ -95,12 +95,15 @@ class MongoDB:
         return tweets
 
 
-    def mongo_get_oldest(self):
+    def mongo_get_oldest(self, handle=None):
         # Tweets are returned in reverse order so by querying for the oldest record we know where to pick up
         # if we need to restart the capture.
         collection = self.__mongo_collection()
 
-        obj = collection.find({}, {'_id': 1}).sort('_id', pymongo.ASCENDING).limit(1)
+        if handle:
+            obj = collection.find({'user.screen_name': handle}, {'_id': 1}).sort('_id', pymongo.ASCENDING).limit(1)
+        else:
+            obj = collection.find({}, {'_id': 1}).sort('_id', pymongo.ASCENDING).limit(1)
         if obj.count() == 0:
             return False
         else:

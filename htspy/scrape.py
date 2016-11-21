@@ -40,40 +40,43 @@ class Query:
         return s
 
 
+def __scrape_get_resumeid(collection, handle=None, mongo_user=None, mongo_pw=None, mongo_auth=None):
+    db = utils.MongoDB('twitter', collection, user=mongo_user, pw=mongo_pw, auth=mongo_auth)
+    return db.mongo_get_oldest(handle)
+
+
 def __twitter_get_api(api_key, api_secret):
     auth = tweepy.AppAuthHandler(api_key, api_secret)
     api = tweepy.API(auth, wait_on_rate_limit=True, wait_on_rate_limit_notify=True)
 
     return api
 
+
 def __twitter_get_page(query, api, collection, resume_id=0):
-    page_len = 1
-    while page_len > 0:
-        if resume_id > 0:
-            page = api.search(q=query.value, locale="en", lang="en", count=TWEET_PER_CALL, result_type='recent',
-                              max_id=resume_id)
-        else:
-            page = api.search(q=query.value, locale="en", lang="en", count=TWEET_PER_CALL, result_type='recent')
-            resume_id=0
+    if resume_id > 0:
+        search_tweets = api.search(q=query.value, locale="en", lang="en", count=TWEET_PER_CALL, result_type='recent',
+                          max_id=resume_id-1)
+    else:
+        search_tweets = api.search(q=query.value, locale="en", lang="en", count=TWEET_PER_CALL, result_type='recent')
 
+    while len(search_tweets)>0:
         batch_tweets = []
-        page_len = len(page)
 
-        if page_len > 0:
-            for tweet in page:
-                if tweet.id != resume_id:
-                    batch_tweets.append(Tweet(tweet).value)
+        for tweet in search_tweets:
+            batch_tweets.append(Tweet(tweet).value)
 
-            db = utils.MongoDB('twitter', collection)
-            db.mongo_save(batch_tweets)
-            resume_id = page[-1].id
-            sleep(TWEET_REST_TIME)
-        else:
-            return False
+        db = utils.MongoDB('twitter', collection)
+        db.mongo_save(batch_tweets)
+        resume_id = search_tweets[-1].id-1
+        sleep(TWEET_REST_TIME)
+
+        search_tweets = api.search(q=query.value, locale="en", lang="en", count=TWEET_PER_CALL, result_type='recent',
+                          max_id=resume_id-1)
+
+    return False
 
 
 def __twitter_get_user(handle, api, collection, resume_id=0):
-
     if resume_id>0:
         user_tweets = api.user_timeline(screen_name=handle, count=200, max_id=resume_id-1)
     else:
@@ -95,8 +98,7 @@ def __twitter_get_user(handle, api, collection, resume_id=0):
     return False
 
 
-
-def scrape(query, api_key, api_secret, collection, resume_id=0, mongo_user=None, mongo_pw=None, mongo_auth=None):
+def scrape_search(query, api_key, api_secret, collection, resume_id=0, mongo_user=None, mongo_pw=None, mongo_auth=None):
     api = __twitter_get_api(api_key, api_secret)
     error_count = 0
     continue_loop = True
@@ -105,15 +107,13 @@ def scrape(query, api_key, api_secret, collection, resume_id=0, mongo_user=None,
         if resume_id > 0:
             print("Scrape: Resume from Tweet ({ID})".format(ID=resume_id))
         else:
-            db = utils.MongoDB('twitter', collection, user=mongo_user, pw=mongo_pw, auth=mongo_auth)
-            resume_id = db.mongo_get_oldest()
+
+            resume_id = __scrape_get_resumeid(collection,mongo_user=mongo_user, mongo_pw=mongo_pw,
+                                              mongo_auth=mongo_auth)
             if not resume_id:
-                print("Scrape: Start from {DATE}".format(
-                    DATE=query.end_date
-                ))
+                print("Scrape: Start from {DATE}".format(DATE=query.end_date))
             else:
                 print("Scrape: Resume from Tweet ({ID})".format(ID=resume_id))
-
 
         try:
             continue_loop = __twitter_get_page(query, api, collection, resume_id)
@@ -136,14 +136,22 @@ def scrape(query, api_key, api_secret, collection, resume_id=0, mongo_user=None,
         ))
 
 
-def scrape_user(handle, api_key, api_secret, collection, resume_id=None, mongo_user=None, mongo_pw=None,
-                mongo_auth=None):
+def scrape_user(handle, api_key, api_secret, collection, resume_id=0, mongo_user=None, mongo_pw=None, mongo_auth=None):
     api = __twitter_get_api(api_key, api_secret)
     error_count = 0
     continue_loop = True
 
     while error_count < TWEET_MAX_RESTARTS and continue_loop:
-        print("Scrape: Resume from Tweet ({ID})".format(ID=resume_id))
+        if resume_id > 0:
+            print("Scrape: Resume from Tweet ({ID})".format(ID=resume_id))
+        else:
+
+            resume_id = __scrape_get_resumeid(collection,handle=handle, mongo_user=mongo_user, mongo_pw=mongo_pw,
+                                              mongo_auth=mongo_auth)
+            if not resume_id:
+                print("Scrape: Getting tweets for {HANDLE}".format(HANDLE=handle))
+            else:
+                print("Scrape: Getting tweets for {HANDLE} from Tweet ({ID})".format(HANDLE=handle, ID=resume_id))
 
         try:
             continue_loop = __twitter_get_user(handle, api, collection)

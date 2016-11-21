@@ -1,7 +1,7 @@
 # htspy - Helpful Twitter Scraper for Python
 Wrapper for tweepy which makes it easier to capture all tweets matching a group of hashtags or terms for a specified date range into a local MongoDB instance. Only a date range and search terms are required. The remainder of the save and iteration logic is handled by the wrapper.
 
-## Capeabilities
+## Capabilities
 1. Scrape the Twitter Search API for specific hashtags or terms
 2. Scrape a specific user timeline (new)
 3. Get the last N tweets for last M unique users who appear in a MongoDB collection of tweets (new)

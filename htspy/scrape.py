@@ -76,17 +76,24 @@ def __twitter_get_page(query, api, collection, resume_id=0):
     return False
 
 
-def __twitter_get_user(handle, api, collection, resume_id=0):
+def __twitter_get_user(handle, api, collection, resume_id=0, max_tweets=0):
     if resume_id>0:
         user_tweets = api.user_timeline(screen_name=handle, count=200, max_id=resume_id-1)
     else:
         user_tweets = api.user_timeline(screen_name=handle, count=200)
 
-    while len(user_tweets)>0:
+    continue_loop = True
+    i=0
+
+    while len(user_tweets)>0 and continue_loop:
         batch_tweets = []
 
         for tweet in user_tweets:
+            if max_tweets>0 and i>=max_tweets:
+                continue_loop=False
+                break
             batch_tweets.append(Tweet(tweet).value)
+            i+=1
 
         db = utils.MongoDB('twitter', collection)
         db.mongo_save(batch_tweets)
@@ -172,3 +179,32 @@ def scrape_user(handle, api_key, api_secret, collection, resume_id=0, mongo_user
         print("Scrape: Finished without errors @ {DATE}".format(
             DATE=datetime.datetime.now().isoformat()
         ))
+
+def scrape_network(api_key, api_secret, src_collection, dst_collection, user_max_tweets, restart_handle=None,
+                   max_handles=0, mongo_user=None, mongo_pw=None, mongo_auth=None):
+    # Gets all unique Twitter handles in source collection and iterates through each to collect the last N tweets.
+    # Can be restarted from a specific Twitter handle
+    api = __twitter_get_api(api_key, api_secret)
+    db_src = utils.MongoDB('twitter', src_collection, user=mongo_user, auth=mongo_auth, pw=mongo_pw)
+
+    handles = list(db_src.mongo_get_handles())
+    start = 0
+    print("Found {COUNT} unique handles in {COLLECTION}.".format(COUNT=len(handles), COLLECTION=src_collection))
+
+    if restart_handle:
+        start = [x['_id'] for x in handles].index(restart_handle)
+
+    for h in range(start, len(handles)):
+        if max_handles>0 and h-start>=max_handles:
+            break
+        print("Scrape: Getting {COUNT} tweets for {HANDLE}.".format(COUNT=user_max_tweets,
+                                                                    HANDLE=handles[h].get('_id')))
+
+        __twitter_get_user(handles[h].get('_id'), api, dst_collection, max_tweets=user_max_tweets)
+
+    print("Scrape: Finished without errors @ {DATE}".format(
+        DATE=datetime.datetime.now().isoformat()
+    ))
+
+
+

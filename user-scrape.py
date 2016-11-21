@@ -3,9 +3,8 @@ import argparse
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Begin a scrape of the Twitter search feed for all tweets matching any of the '
-                    'search terms specified in the terms argument. Sweeps backwards from the '
-                    'most recent date to the latest date.',
+        description='Begin a scrape of the specified user Twitter timeline. If no restart id is specified then '
+                    'the scrape will begin at the first returned from the API or the last ID in the MongoDB.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter
     )
     ag = parser.add_argument

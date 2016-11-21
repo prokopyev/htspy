@@ -77,6 +77,13 @@ class MongoDB:
                 tweet.pop('user')
                 outfile.write(json.dumps(tweet) +'\n')
 
+    def mongo_get_handles(self):
+        collection = self.__mongo_collection()
+        pipeline = [
+            {'$group': {'_id': '$user.screen_name', 'max_id': {'$max': '$_id'}}},
+            {'$sort': {'max_id': -1}}
+        ]
+        return collection.aggregate(pipeline)
 
     def mongo_get_tweets(self):
         collection = self.__mongo_collection()
